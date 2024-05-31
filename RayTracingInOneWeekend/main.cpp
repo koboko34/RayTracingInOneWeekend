@@ -1,3 +1,6 @@
+#include "Vec3.h"
+#include "Color.h"
+
 #include <iostream>
 
 int main()
@@ -13,15 +16,8 @@ int main()
 
 		for (size_t i = 0; i < WIDTH; i++)
 		{
-			double r = double(i) / (WIDTH - 1);
-			double g = double(j) / (HEIGHT - 1);
-			double b = 0.0;
-
-			int ir = int(255.999 * r);
-			int ig = int(255.999 * g);
-			int ib = int(255.999 * b);
-
-			std::cout << ir << " " << ig << " " << ib << "\n";
+			Color pixel_color(double(i) / (WIDTH - 1), double(j) / (HEIGHT - 1), 0.0);
+			write_color(std::cout, pixel_color);
 		}
 	}
 
