@@ -7,7 +7,7 @@
 Color ray_color(const Ray& r)
 {
 	Vec3 unit_dir = unit_vector(r.direction());
-	double a = 0.5 * (unit_dir.y() + 1.0); // this doesn't get the expected result
+	double a = 0.5 * (unit_dir.y() + 1.0);
 	
 	return (1.0 - a) * Color(1.0, 1.0, 1.0) + a * Color(0.5, 0.7, 1.0);
 }
@@ -17,7 +17,8 @@ int main()
 	// Image
 	double aspect_ratio = 16.0 / 9.0;
 	const int IMAGE_WIDTH = 400;
-	const int IMAGE_HEIGHT = int(IMAGE_WIDTH / aspect_ratio) < 1 ? 1 : int(IMAGE_WIDTH / aspect_ratio);
+	int IMAGE_HEIGHT = int(IMAGE_WIDTH / aspect_ratio);
+	IMAGE_HEIGHT = (IMAGE_HEIGHT < 1) ? 1 : IMAGE_HEIGHT;
 
 	// Camera
 	double focal_length = 1.0;
@@ -31,7 +32,7 @@ int main()
 	Vec3 pixel_delta_u = viewport_u / IMAGE_WIDTH;
 	Vec3 pixel_delta_v = viewport_v / IMAGE_HEIGHT;
 
-	Point3 viewport_upper_left = camera_center - viewport_u / 2 - viewport_v / 2;
+	Point3 viewport_upper_left = camera_center - Vec3(0, 0, focal_length) - viewport_u / 2 - viewport_v / 2;
 	Point3 start_pixel_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 
 	std::cout << "P3\n" << IMAGE_WIDTH << " " << IMAGE_HEIGHT << "\n255\n";
