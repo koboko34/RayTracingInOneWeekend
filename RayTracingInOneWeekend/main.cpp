@@ -10,7 +10,7 @@ Color ray_color(const Ray& r)
 	Point3 center = Point3(0, 0, -1);
 	Sphere sphere(center, 0.5);
 
-	Hit_Record rec;
+	HitRecord rec;
 	if (sphere.hit(r, 0, INFINITY, rec))
 	{
 		return 0.5 * Color(rec.normal.x() + 1, rec.normal.y() + 1, rec.normal.z() + 1);
