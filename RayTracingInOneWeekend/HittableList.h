@@ -5,7 +5,6 @@
 
 #include "Hittable.h"
 
-#include <memory>
 #include <vector>
 
 class HittableList : public Hittable

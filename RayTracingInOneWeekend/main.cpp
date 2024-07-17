@@ -1,19 +1,16 @@
-#include "Vec3.h"
-#include "Color.h"
-#include "Ray.h"
+#include "RTWeekend.h"
+
+#include "Hittable.h"
+#include "HittableList.h"
 #include "Sphere.h"
 
-#include <iostream>
 
-Color ray_color(const Ray& r)
+Color ray_color(const Ray& r, const Hittable& world)
 {
-	Point3 center = Point3(0, 0, -1);
-	Sphere sphere(center, 0.5);
-
 	HitRecord rec;
-	if (sphere.hit(r, 0, INFINITY, rec))
+	if (world.hit(r, 0, INF, rec))
 	{
-		return 0.5 * Color(rec.normal.x() + 1, rec.normal.y() + 1, rec.normal.z() + 1);
+		return 0.5 * (rec.normal + Color(1, 1, 1));
 	}
 	
 	Vec3 unit_dir = unit_vector(r.direction());
@@ -28,6 +25,11 @@ int main()
 	const int IMAGE_WIDTH = 400;
 	int IMAGE_HEIGHT = int(IMAGE_WIDTH / aspect_ratio);
 	IMAGE_HEIGHT = (IMAGE_HEIGHT < 1) ? 1 : IMAGE_HEIGHT;
+
+	// World
+	HittableList world;
+	world.add(std::make_shared<Sphere>(Point3(0, 0, -1), 0.5));
+	world.add(std::make_shared<Sphere>(Point3(0, -100.5, -1), 100));
 
 	// Camera
 	double focal_length = 1.0;
@@ -56,7 +58,7 @@ int main()
 			Vec3 dir = pixel_center - camera_center;
 			Ray r(camera_center, dir);
 			
-			Color pixel_color = ray_color(r);
+			Color pixel_color = ray_color(r, world);
 			write_color(std::cout, pixel_color);
 		}
 	}

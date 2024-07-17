@@ -3,8 +3,6 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
-#include "Ray.h"
-
 struct HitRecord
 {
 	Point3 p;

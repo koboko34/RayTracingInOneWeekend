@@ -35,7 +35,7 @@
     <ClInclude Include="HittableList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="x64\RTWeekend.h">
+    <ClInclude Include="RTWeekend.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
