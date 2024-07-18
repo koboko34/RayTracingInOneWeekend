@@ -9,6 +9,7 @@ public:
 	double aspect_ratio = 1.0;
 	int image_width = 100;
 	int samples_per_pixel = 10;
+	int max_depth = 10;
 
 	void render(const Hittable& world)
 	{
@@ -26,7 +27,7 @@ public:
 				for (int sample = 0; sample < samples_per_pixel; sample++)
 				{
 					Ray r = get_ray(i, j);
-					pixel_color += ray_color(r, world);
+					pixel_color += ray_color(r, max_depth, world);
 				}
 
 				write_color(std::cout, pixel_samples_scale * pixel_color);
@@ -86,12 +87,16 @@ private:
 		return Vec3(random_double() - 0.5, random_double() - 0.5, 0);
 	}
 
-	Color ray_color(const Ray& r, const Hittable& world) const
+	Color ray_color(const Ray& r, int depth, const Hittable& world) const
 	{
+		if (depth <= 0)
+			return Color(0, 0, 0);
+		
 		HitRecord rec;
-		if (world.hit(r, Interval(0, INF), rec))
+		if (world.hit(r, Interval(0.001, INF), rec))
 		{
-			return 0.5 * (rec.normal + Color(1, 1, 1));
+			Vec3 dir = rec.normal + random_unit_vector();
+			return 0.5 * ray_color(Ray(rec.p, dir), depth - 1, world);
 		}
 
 		Vec3 unit_dir = unit_vector(r.direction());
