@@ -3,10 +3,13 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
+class Material;
+
 struct HitRecord
 {
 	Point3 p;
 	Vec3 normal;
+	std::shared_ptr<Material> mat;
 	double t;
 	bool front_face;
 

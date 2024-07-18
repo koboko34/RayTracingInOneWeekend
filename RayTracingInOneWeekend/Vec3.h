@@ -50,6 +50,12 @@ public:
 		return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
 	}
 
+	bool near_zero() const {
+		// return true if the vector is close to zero in all dimensions
+		double s = 1e-8;
+		return (std::fabs(e[0]) < s) && (std::fabs(e[1]) < s) && (std::fabs(e[2]) < s);
+	}
+
 	static Vec3 random()
 	{
 		return Vec3(random_double(), random_double(), random_double());
@@ -147,6 +153,19 @@ inline Vec3 random_on_hemisphere(const Vec3 normal)
 		return on_unit_sphere;
 	}
 	return -on_unit_sphere;
+}
+
+inline Vec3 reflect(const Vec3& v, const Vec3 n)
+{
+	return v - 2 * dot(v, n) * n;
+}
+
+inline Vec3 refract(const Vec3& uv, const Vec3 n, double etai_over_etat)
+{
+	double cos_theta = fmin(dot(-uv, n), 1.0);
+	Vec3 r_out_perp = etai_over_etat * (uv + cos_theta * n);
+	Vec3 r_out_parallel = -sqrt(fabs(1.0 - r_out_perp.length_squared())) * n;
+	return r_out_perp + r_out_parallel;
 }
 
 #endif
