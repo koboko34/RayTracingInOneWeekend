@@ -11,6 +11,11 @@ public:
 	int samples_per_pixel = 10;
 	int max_depth = 10;
 
+	double vfov = 90.0;
+	Point3 lookfrom = Point3(0, 0, 0);
+	Point3 lookat = Point3(0, 0, -1);
+	Vec3 vup = Vec3(0, 1, 0);		// camera relative up direction
+
 	void render(const Hittable& world)
 	{
 		initialise();
@@ -45,6 +50,7 @@ private:
 	Vec3 pixel_delta_v;
 	Point3 camera_center;
 	Point3 start_pixel_loc;
+	Vec3 u, v, w;
 
 	void initialise()
 	{
@@ -53,19 +59,25 @@ private:
 
 		pixel_samples_scale = 1.0 / samples_per_pixel;
 		
-		camera_center = Point3(0, 0, 0);
+		camera_center = lookfrom;
 		
-		double focal_length = 1.0;
-		const double VIEWPORT_HEIGHT = 2.0;
+		double focal_length = (lookfrom - lookat).length();
+		double theta = degrees_to_radians(vfov);
+		double h = tan(theta / 2.0);
+		const double VIEWPORT_HEIGHT = 2.0 * h * focal_length;
 		const double VIEWPORT_WIDTH = VIEWPORT_HEIGHT * (double(image_width) / image_height);
 
-		Vec3 viewport_u = Vec3(VIEWPORT_WIDTH, 0, 0);
-		Vec3 viewport_v = Vec3(0, -VIEWPORT_HEIGHT, 0);
+		w = unit_vector(lookfrom - lookat);
+		u = unit_vector(cross(vup, w));
+		v = cross(w, u);
+
+		Vec3 viewport_u = VIEWPORT_WIDTH * u;
+		Vec3 viewport_v = VIEWPORT_HEIGHT * -v;
 
 		pixel_delta_u = viewport_u / image_width;
 		pixel_delta_v = viewport_v / image_height;
 
-		Point3 viewport_upper_left = camera_center - Vec3(0, 0, focal_length) - viewport_u / 2 - viewport_v / 2;
+		Point3 viewport_upper_left = camera_center - (focal_length * w) - viewport_u / 2 - viewport_v / 2;
 		start_pixel_loc = viewport_upper_left + 0.5 * (pixel_delta_u + pixel_delta_v);
 	}
 
