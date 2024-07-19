@@ -30,6 +30,7 @@
     <ClInclude Include="Material.h" />
     <ClInclude Include="RTWeekend.h" />
     <ClInclude Include="Sphere.h" />
+    <ClInclude Include="Timer.h" />
     <ClInclude Include="Vec3.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
