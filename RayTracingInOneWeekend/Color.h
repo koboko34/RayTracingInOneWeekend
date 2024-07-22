@@ -3,6 +3,8 @@
 #ifndef COLOR_H
 #define COLOR_H
 
+#include <string>
+
 #include "Interval.h"
 
 using Color = Vec3;
@@ -15,7 +17,7 @@ inline double linear_to_gamma(double linear_component)
 	return 0;
 }
 
-void write_color(std::ostream& out, const Color& pixel_color)
+std::string write_color(std::ostream& out, const Color& pixel_color)
 {
 	double r = pixel_color.x();
 	double g = pixel_color.y();
@@ -32,7 +34,8 @@ void write_color(std::ostream& out, const Color& pixel_color)
 	int gbyte = int(256 * intensity.clamp(g));
 	int bbyte = int(256 * intensity.clamp(b));
 
-	out << rbyte << " " << gbyte << " " << bbyte << "\n";
+	std::string out_color = std::to_string(rbyte) + " " + std::to_string(gbyte) + " " + std::to_string(bbyte) + "\n";
+	return out_color;
 }
 
 #endif

@@ -3,6 +3,10 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
+#include <thread>
+#include <future>
+#include <mutex>
+
 class Camera
 {
 public:
@@ -19,27 +23,34 @@ public:
 	double defocus_angle = 0.0;		// variation angle of rays through each pixel
 	double focus_dist = 10.0;		// distance from camera lookfrom point to plane of perfect focus
 
-	void render(const Hittable& world)
+	Camera(const Hittable& world) : world(world) {}
+
+	void render()
 	{
 		initialise();
 
+		// -1 == not yet handled by any thread, any number other than -1 signifies which thread is handling the line
+		lines_rendered.resize(image_height, -1);
+		lines_as_string.resize(image_height);
+
 		std::cout << "P3\n" << image_width << " " << image_height << "\n255\n";
 
-		for (int j = 0; j < image_height; j++)
+		const int numOfThreads = 12;
+		std::vector<std::future<void>> futures;
+
+		for (int i = 0; i < numOfThreads; ++i)
 		{
-			std::clog << "\rScanlines remaining: " << (image_height - j) << " " << std::flush;
+			futures.push_back(std::async(std::launch::async, &Camera::render_next_line, this, i));
+		}
 
-			for (int i = 0; i < image_width; i++)
-			{
-				Color pixel_color(0, 0, 0);
-				for (int sample = 0; sample < samples_per_pixel; sample++)
-				{
-					Ray r = get_ray(i, j);
-					pixel_color += ray_color(r, max_depth, world);
-				}
+		for (auto& future : futures)
+		{
+			future.get();
+		}
 
-				write_color(std::cout, pixel_samples_scale * pixel_color);
-			}
+		for (const std::string& s : lines_as_string)
+		{
+			std::cout << s;
 		}
 
 		std::clog << "\rDone.                  \n";
@@ -56,11 +67,18 @@ private:
 	Vec3 u, v, w;
 	Vec3 defocus_disk_u;
 	Vec3 defocus_disk_v;
+	const Hittable& world;
+
+	int lines_left;
+	std::vector<int> lines_rendered;
+	std::vector<std::string> lines_as_string;
+	std::mutex mtx;
 
 	void initialise()
-	{
+	{		
 		image_height = int(image_width / aspect_ratio);
 		image_height = (image_height < 1) ? 1 : image_height;
+		lines_left = image_height;
 
 		pixel_samples_scale = 1.0 / samples_per_pixel;
 		
@@ -136,6 +154,49 @@ private:
 		Vec3 unit_dir = unit_vector(r.direction());
 		double a = 0.5 * (unit_dir.y() + 1.0);
 		return (1.0 - a) * Color(1.0, 1.0, 1.0) + a * Color(0.5, 0.7, 1.0);
+	}
+
+	void render_next_line(int id)
+	{		
+		std::unique_lock<std::mutex> lock(mtx);
+		
+		bool found_empty_line = false;
+		for (int j = 0; j < image_height; j++)
+		{
+			if (lines_rendered[j] == -1)
+			{
+				lines_rendered[j] = id;
+				std::clog << "\rScanlines remaining: " << std::to_string(lines_left) << " " << std::flush;
+				lines_left--;
+
+				lock.unlock();
+				found_empty_line = true;
+
+				// render the line
+				for (int i = 0; i < image_width; i++)
+				{
+					Color pixel_color(0, 0, 0);
+					for (int sample = 0; sample < samples_per_pixel; sample++)
+					{
+						Ray r = get_ray(i, j);
+						pixel_color += ray_color(r, max_depth, world);
+					}
+
+					lines_as_string[j] += write_color(std::cout, pixel_samples_scale * pixel_color);
+				}
+				break;
+			}
+		}
+
+		if (lock.owns_lock())
+		{
+			lock.unlock();
+		}
+
+		if (found_empty_line)
+		{
+			render_next_line(id);
+		}
 	}
 };
 

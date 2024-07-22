@@ -62,9 +62,9 @@ int main()
 	world.add(std::make_shared<Sphere>(Point3(4.0, 1.0, 0), 1.0, material_three));
 	
 
-	Camera camera;
+	Camera camera(world);
 	camera.aspect_ratio = 16.0 / 9.0;
-	camera.image_width = 1200;
+	camera.image_width = 1920;
 	camera.samples_per_pixel = 500;
 	camera.max_depth = 50;
 
@@ -76,7 +76,7 @@ int main()
 	camera.defocus_angle = 0.6;
 	camera.focus_dist = 10.0;
 
-	camera.render(world);
+	camera.render();
 
 	return 0;
 }
