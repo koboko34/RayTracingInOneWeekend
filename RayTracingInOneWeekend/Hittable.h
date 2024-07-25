@@ -3,6 +3,8 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
+#include "AABB.h"
+
 class Material;
 
 struct HitRecord
@@ -28,6 +30,7 @@ public:
 	virtual ~Hittable() = default;
 
 	virtual bool hit(const Ray& r, Interval ray_t, HitRecord& rec) const = 0;
+	virtual AABB bounding_box() const = 0;
 };
 
 #endif

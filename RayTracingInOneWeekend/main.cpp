@@ -27,14 +27,14 @@ int main()
 			{
 				std::shared_ptr<Material> sphere_mat;
 
-				if (choose_mat < 0.8)
+				if (choose_mat < 0.6)
 				{
 					// diffuse
 					Color albedo = Color::random() * Color::random();
 					sphere_mat = std::make_shared<Lambertian>(albedo);
 					world.add(std::make_shared<Sphere>(center, 0.2, sphere_mat));
 				}
-				else if (choose_mat < 0.95)
+				else if (choose_mat < 0.9)
 				{
 					// metal
 					Color albedo = Color::random(0.5, 1.0);
