@@ -10,7 +10,7 @@ class AABB
 public:
 	Interval x, y, z;
 
-	AABB();
+	AABB() {}
 	AABB(const Interval& x, const Interval& y, const Interval& z) : x(x), y(y), z(z) {}
 	AABB(const Point3& a, const Point3& b)
 	{

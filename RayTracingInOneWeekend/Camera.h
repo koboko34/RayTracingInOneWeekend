@@ -35,7 +35,7 @@ public:
 
 		std::cout << "P3\n" << image_width << " " << image_height << "\n255\n";
 
-		const int numOfThreads = 12;
+		const int numOfThreads = std::thread::hardware_concurrency();
 		std::vector<std::future<void>> futures;
 
 		for (int i = 0; i < numOfThreads; ++i)
